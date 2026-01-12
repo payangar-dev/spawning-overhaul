@@ -3,6 +3,7 @@
 build/
 out/
 classes/
+bin/
 
 # Eclipse
 *.launch
@@ -35,7 +36,6 @@ Thumbs.db
 crash-reports/
 saves/
 screenshots/
-config/
 options.txt
 servers.dat
 usercache.json
@@ -50,3 +50,4 @@ usernamecache.json
 # Config files (don't commit user configs)
 *.json5
 !*example*.json5
+.claude

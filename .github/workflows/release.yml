@@ -1,0 +1,135 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version increment type'
+        required: true
+        type: choice
+        options:
+          - MINOR
+          - MAJOR
+      skip_version_bump:
+        description: 'Release with current version (no increment)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Get current version
+        id: current_version
+        run: |
+          CURRENT=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2)
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+
+      - name: Calculate new version
+        id: new_version
+        run: |
+          CURRENT="${{ steps.current_version.outputs.version }}"
+          
+          if [ "${{ github.event.inputs.skip_version_bump }}" == "true" ]; then
+            echo "version=$CURRENT" >> $GITHUB_OUTPUT
+            echo "Keeping current version: $CURRENT"
+          else
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+            
+            if [ "${{ github.event.inputs.version_type }}" == "MAJOR" ]; then
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+            else
+              MINOR=$((MINOR + 1))
+              PATCH=0
+            fi
+            
+            NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+            echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "New version: $NEW_VERSION"
+          fi
+
+      - name: Update version in gradle.properties
+        if: ${{ github.event.inputs.skip_version_bump != 'true' }}
+        run: |
+          sed -i "s/^mod_version=.*/mod_version=${{ steps.new_version.outputs.version }}/" gradle.properties
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Get artifact names
+        id: artifacts
+        run: |
+          FABRIC_JAR=$(ls fabric/build/libs/*.jar | grep -v sources | head -1)
+          NEOFORGE_JAR=$(ls neoforge/build/libs/*.jar | grep -v sources | head -1)
+
+          echo "fabric_path=$FABRIC_JAR" >> $GITHUB_OUTPUT
+          echo "fabric_name=$(basename $FABRIC_JAR)" >> $GITHUB_OUTPUT
+
+          echo "neoforge_path=$NEOFORGE_JAR" >> $GITHUB_OUTPUT
+          echo "neoforge_name=$(basename $NEOFORGE_JAR)" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -z "$LATEST_TAG" ]; then
+            # No previous tag, get all commits
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            # Get commits since last tag
+            COMMITS=$(git log ${LATEST_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          if [ -z "$COMMITS" ]; then
+            COMMITS="- No changes since last release"
+          fi
+          
+          # Write to file for multiline support
+          echo "## What's Changed" > changelog.md
+          echo "" >> changelog.md
+          echo "$COMMITS" >> changelog.md
+          echo "" >> changelog.md
+          echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${LATEST_TAG}...v${{ steps.new_version.outputs.version }}" >> changelog.md
+
+      - name: Commit version bump
+        if: ${{ github.event.inputs.skip_version_bump != 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add gradle.properties
+          git commit -m "Bump version to ${{ steps.new_version.outputs.version }}"
+          git push
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.new_version.outputs.version }}
+          name: Release v${{ steps.new_version.outputs.version }}
+          body_path: changelog.md
+          files: |
+            ${{ steps.artifacts.outputs.fabric_path }}
+            ${{ steps.artifacts.outputs.neoforge_path }}
+          draft: false
+          prerelease: false
