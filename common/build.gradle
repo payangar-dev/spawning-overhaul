@@ -1,0 +1,38 @@
+plugins {
+    id 'java-library'
+    id 'fabric-loom' version '1.11-SNAPSHOT'
+}
+
+// Note: Common module should NOT depend on any loader-specific APIs
+// It should only use vanilla Minecraft classes for compilation
+
+loom {
+    // Don't generate sources jar for common
+    runs {
+        // No run configurations for common module
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+
+    // YACL for config (modCompileOnly so it's available during compilation)
+    modCompileOnly "dev.isxander:yet-another-config-lib:${project.yacl_version_fabric}"
+
+    // Guava for caching (compileOnly since it's provided by loaders)
+    compileOnly "com.google.guava:guava:32.1.2-jre"
+}
+
+java {
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${project.mod_id}-common"
+            from components.java
+        }
+    }
+}

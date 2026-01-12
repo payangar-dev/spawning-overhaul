@@ -1,0 +1,75 @@
+plugins {
+    id 'net.neoforged.moddev' version '2.0.95'
+}
+
+base {
+    archivesName = "${project.mod_id}-neoforge"
+}
+
+neoForge {
+    version = project.neoforge_version
+
+    // Parchment mappings disabled for initial setup
+    // parchment {
+    //     minecraftVersion = project.minecraft_version
+    //     mappingsVersion = "2024.07.28"
+    // }
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        spawningoverhaul {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    // YACL for NeoForge
+    implementation "dev.isxander:yet-another-config-lib:${project.yacl_version_neoforge}"
+
+    // Guava is already provided by NeoForge, no need to add it
+
+    // Common module dependency
+    implementation project(':common')
+}
+
+// Include common module classes directly in the jar
+tasks.named('jar', Jar) {
+    from project(':common').sourceSets.main.output
+}
+
+tasks.withType(ProcessResources).configureEach {
+    inputs.property 'version', project.mod_version
+    inputs.property 'minecraft_version', project.minecraft_version
+    inputs.property 'neoforge_version', project.neoforge_version
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand(
+            'mod_id': project.mod_id,
+            'mod_name': project.mod_name,
+            'mod_version': project.mod_version,
+            'mod_description': project.mod_description,
+            'mod_author': project.mod_author,
+            'minecraft_version': project.minecraft_version,
+            'neoforge_version': project.neoforge_version,
+            'yacl_version': project.yacl_version_neoforge
+        )
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${project.mod_id}-neoforge"
+            from components.java
+        }
+    }
+}

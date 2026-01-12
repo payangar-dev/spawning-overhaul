@@ -1,0 +1,72 @@
+plugins {
+    id 'fabric-loom' version '1.11-SNAPSHOT'
+}
+
+base {
+    archivesName = "${project.mod_id}-fabric"
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    // YACL for Fabric
+    modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version_fabric}"
+
+    // ModMenu for config screen integration
+    modImplementation "com.terraformersmc:modmenu:11.0.1"
+
+    // Guava is already provided by Minecraft/Fabric, no need to add it
+
+    // Common module dependency - use include to embed it in the final jar
+    implementation project(':common')
+    include project(':common')
+}
+
+loom {
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+}
+
+processResources {
+    inputs.property 'version', project.mod_version
+    inputs.property 'minecraft_version', project.minecraft_version
+    inputs.property 'fabric_loader_version', project.fabric_loader_version
+
+    filesMatching('fabric.mod.json') {
+        expand(
+            'mod_id': project.mod_id,
+            'mod_name': project.mod_name,
+            'mod_version': project.mod_version,
+            'mod_description': project.mod_description,
+            'minecraft_version': project.minecraft_version,
+            'fabric_loader_version': project.fabric_loader_version,
+            'fabric_api_version': project.fabric_api_version,
+            'yacl_version': project.yacl_version_fabric
+        )
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${project.mod_id}-fabric"
+            from components.java
+        }
+    }
+}

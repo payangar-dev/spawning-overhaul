@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+
+    group = project.mod_group_id
+    version = project.mod_version
+
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.neoforged.net/releases/' }
+        maven { url = 'https://maven.isxander.dev/releases/' }
+        maven { url = 'https://maven.parchmentmc.org/' }
+        maven { url = 'https://maven.terraformersmc.com/' }
+        maven { url = 'https://thedarkcolour.github.io/KotlinForForge/' }
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(project.java_version as int)
+        }
+        withSourcesJar()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = project.java_version as int
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    dependencies {
+        // Common dependencies can be added here if needed
+    }
+}

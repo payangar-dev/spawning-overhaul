@@ -1,0 +1,52 @@
+# Gradle
+.gradle/
+build/
+out/
+classes/
+
+# Eclipse
+*.launch
+.settings/
+.metadata
+.classpath
+.project
+.recommenders
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VSCode
+.vscode/
+
+# Fabric
+run/
+logs/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Minecraft client/server files
+crash-reports/
+saves/
+screenshots/
+config/
+options.txt
+servers.dat
+usercache.json
+usernamecache.json
+
+# Mod development
+*.jar
+!gradle-wrapper.jar
+*.log
+*.lock
+
+# Config files (don't commit user configs)
+*.json5
+!*example*.json5
