@@ -35,11 +35,6 @@ public class SpawningOverhaulNeoForge {
         // NeoForge-specific initialization
         registerNeoForgeEvents(modBus);
 
-        // Register config screen
-        modContainer.registerExtensionPoint(
-            net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
-            (container, parent) -> com.spawningoverhaul.config.YACLConfigScreenFactory.createConfigScreen(parent)
-        );
     }
 
     private void registerNeoForgeEvents(IEventBus modBus) {
