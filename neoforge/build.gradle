@@ -61,7 +61,7 @@ tasks.withType(ProcessResources).configureEach {
             'mod_author': project.mod_author,
             'minecraft_version': project.minecraft_version,
             'neoforge_version': project.neoforge_version,
-            'yacl_version': project.yacl_version_neoforge
+            'yacl_version': project.yacl_version
         )
     }
 }

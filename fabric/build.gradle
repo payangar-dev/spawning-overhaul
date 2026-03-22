@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id 'fabric-loom' version '1.13-SNAPSHOT'
 }
 
 base {
@@ -57,7 +57,7 @@ processResources {
             'minecraft_version': project.minecraft_version,
             'fabric_loader_version': project.fabric_loader_version,
             'fabric_api_version': project.fabric_api_version,
-            'yacl_version': project.yacl_version_fabric
+            'yacl_version': project.yacl_version
         )
     }
 }
