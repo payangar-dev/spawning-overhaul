@@ -42,7 +42,7 @@ public class SpawnEventHandler {
 
         var entityType = mob.getType();
         // Create BlockPos from event coordinates
-        var spawnPos = new net.minecraft.core.BlockPos((int)event.getX(), (int)event.getY(), (int)event.getZ());
+        var spawnPos = new net.minecraft.core.BlockPos((int) event.getX(), (int) event.getY(), (int) event.getZ());
         var spawnType = event.getSpawnType();
 
         // Create spawn context for this attempt
@@ -59,17 +59,18 @@ public class SpawnEventHandler {
             event.setResult(MobSpawnEvent.PositionCheck.Result.FAIL);
 
             // Debug logging
-            if (SpawningOverhaulCommon.getLogger() != null) {
-                SpawningOverhaulCommon.getLogger().info(
-                    "Denied spawn of {} at {} (multiplier: {}, outside: {}, cave: {}, forest: {})",
-                    entityType.getDescription().getString(),
-                    spawnPos,
-                    String.format("%.2f", multiplier),
-                    context.isOutside(),
-                    context.isInCave(),
-                    String.format("%.0f%%", context.getForestDensity() * 100.0)
-                );
-            }
+            if (config.debugmode)
+                if (SpawningOverhaulCommon.getLogger() != null) {
+                    SpawningOverhaulCommon.getLogger().info(
+                            "Denied spawn of {} at {} (multiplier: {}, outside: {}, cave: {}, forest: {})",
+                            entityType.getDescription().getString(),
+                            spawnPos,
+                            String.format("%.2f", multiplier),
+                            context.isOutside(),
+                            context.isInCave(),
+                            String.format("%.0f%%", context.getForestDensity() * 100.0)
+                    );
+                }
         }
         // If allowed, leave result as DEFAULT to let vanilla checks proceed
     }
