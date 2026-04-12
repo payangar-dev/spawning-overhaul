@@ -37,6 +37,11 @@ public class SpawnHelperMixin {
             return; // Let vanilla handle it
         }
 
+        // Dimension whitelist: bail out if the current dimension isn't opted in
+        if (!config.isDimensionEnabled(level.dimension())) {
+            return;
+        }
+
         // Create spawn context for this attempt
         SpawnContext context = new SpawnContext(level, pos, entityType, MobSpawnType.NATURAL);
 

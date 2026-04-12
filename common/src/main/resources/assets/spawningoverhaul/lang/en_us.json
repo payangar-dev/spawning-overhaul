@@ -1,13 +1,17 @@
 {
   "yacl3.config.spawningoverhaul:config.category.general": "General",
+  "yacl3.config.spawningoverhaul:config.category.dimensions": "Dimensions",
   "yacl3.config.spawningoverhaul:config.category.environment": "Environmental Multipliers",
   "yacl3.config.spawningoverhaul:config.category.detection": "Detection Settings",
   "yacl3.config.spawningoverhaul:config.category.mobs": "Mob-Specific Rules",
-  
+
   "yacl3.config.spawningoverhaul:config.debugmode": "Debug Mode",
   "yacl3.config.spawningoverhaul:config.debugmode.desc": "Enable debugging output",
   "yacl3.config.spawningoverhaul:config.enableImmersiveSpawning": "Enable Immersive Spawning",
   "yacl3.config.spawningoverhaul:config.enableImmersiveSpawning.desc": "Enable the immersive spawning system",
+
+  "yacl3.config.spawningoverhaul:config.enabledDimensions": "Enabled Dimensions",
+  "yacl3.config.spawningoverhaul:config.enabledDimensions.desc": "List of dimension IDs where the immersive spawning system is active. Supports vanilla and modded dimensions (e.g., 'minecraft:overworld', 'twilightforest:twilight_forest').",
   
   "yacl3.config.spawningoverhaul:config.baseMultiplier": "Base Multiplier",
   "yacl3.config.spawningoverhaul:config.baseMultiplier.desc": "Base spawn rate multiplier applied everywhere (before cave/forest adjustments)",

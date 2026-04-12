@@ -33,6 +33,11 @@ public class SpawnEventHandler {
             return;
         }
 
+        // Dimension whitelist: bail out if the current dimension isn't opted in
+        if (!config.isDimensionEnabled(serverLevel.dimension())) {
+            return;
+        }
+
         // Get spawn information from event
         // Note: MobSpawnEvent.PositionCheck provides access to the Mob entity being spawned
         var mob = event.getEntity();

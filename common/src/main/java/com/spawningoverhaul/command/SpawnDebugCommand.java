@@ -53,9 +53,13 @@ public class SpawnDebugCommand {
         double multiplier = SpawnMultiplierCalculator.calculateMultiplier(spawnContext);
 
         // Build debug output
+        boolean dimensionEnabled = config.isDimensionEnabled(serverLevel.dimension());
+        String dimensionId = serverLevel.dimension().location().toString();
+
         source.sendSuccess(() -> Component.literal("§6=== Spawn Debug Info ==="), false);
         source.sendSuccess(() -> Component.literal("§ePosition: §f" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()), false);
         source.sendSuccess(() -> Component.literal("§eImmersive Spawning: §f" + (config.enableImmersiveSpawning ? "§aEnabled" : "§cDisabled")), false);
+        source.sendSuccess(() -> Component.literal("§eDimension: §f" + dimensionId + " §f(" + (dimensionEnabled ? "§aWhitelisted" : "§cNot Whitelisted") + "§f)"), false);
         source.sendSuccess(() -> Component.literal(""), false);
 
         source.sendSuccess(() -> Component.literal("§6Environment:"), false);

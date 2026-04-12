@@ -1,11 +1,17 @@
 package com.spawningoverhaul.config;
 
 import com.spawningoverhaul.SpawningOverhaulCommon;
+import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.controller.ControllerBuilder;
+import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
+import dev.isxander.yacl3.config.v2.api.ConfigField;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.autogen.*;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -56,6 +62,13 @@ public class SpawningConfig {
     @SerialEntry(comment = "Enable immersive spawning system")
     @TickBox
     public boolean enableImmersiveSpawning = true;
+
+    // ===== Dimension Whitelist =====
+
+    @AutoGen(category = "dimensions")
+    @ListGroup(valueFactory = DimensionListFactory.class, controllerFactory = DimensionListFactory.class)
+    @SerialEntry(comment = "Dimension IDs where immersive spawning is active (vanilla or modded, e.g., 'minecraft:overworld', 'twilightforest:twilight_forest')")
+    public List<String> enabledDimensions = new ArrayList<>(List.of("minecraft:overworld"));
 
     // ===== Environmental Multipliers =====
 
@@ -131,6 +144,14 @@ public class SpawningConfig {
 
     // Methods
 
+    /**
+     * Check whether the immersive spawning system should run in the given dimension.
+     * A dimension is active only if its ID is present in {@link #enabledDimensions}.
+     */
+    public boolean isDimensionEnabled(ResourceKey<Level> dimension) {
+        return enabledDimensions.contains(dimension.location().toString());
+    }
+
     public static void load() {
         HANDLER().load();
         SpawningOverhaulCommon.getLogger().info("Loaded configuration from {}", getConfigPath());
@@ -139,5 +160,17 @@ public class SpawningConfig {
     public static void save() {
         HANDLER().save();
         SpawningOverhaulCommon.getLogger().info("Saved configuration to {}", getConfigPath());
+    }
+
+    public static class DimensionListFactory implements ListGroup.ValueFactory<String>, ListGroup.ControllerFactory<String> {
+        @Override
+        public String provideNewValue() {
+            return "minecraft:";
+        }
+
+        @Override
+        public ControllerBuilder<String> createController(ListGroup annotation, ConfigField<List<String>> field, OptionAccess storage, Option<String> option) {
+            return StringControllerBuilder.create(option);
+        }
     }
 }
